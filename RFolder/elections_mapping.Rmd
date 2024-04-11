@@ -1,0 +1,39 @@
+---
+title: "Elections"
+author: "Robert Feldstein"
+date: "2024-04-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library("GpGp")
+```
+
+```{r}
+# Load the data
+
+df <- read.csv("/Users/robbiefeldstein/Documents/Programming/Election2024/RFolder/merged.csv")
+
+library("GpGp")
+y <- df$Trump..R. - df$Biden..D.
+X <- model.matrix( ~ df$pollster )
+locs <- df$Days.Since.01.01.23
+
+m1 <- fit_model(y, locs, X, "matern_isotropic", silent = TRUE, m_seq = 200)
+
+summary(m1)
+
+days_pred <- min( df$Days.Since.01.01.23 ) : max( df$Days.Since.01.01.23 ) 
+poll_pred <- rep("CNBC", length(days_pred) )
+poll_pred <- factor( poll_pred, levels = levels( as.factor(df$pollster) ) )
+X_pred <- model.matrix( ~ poll_pred )
+
+preds <- predictions( m1, locs_pred = days_pred, X_pred = X_pred, m = 200 )
+plot(days_pred, preds, type = "l", col = "blue", lwd = 2, xlab = "Days since 01.01.23", ylab = "Trump - Biden" )
+```
+
