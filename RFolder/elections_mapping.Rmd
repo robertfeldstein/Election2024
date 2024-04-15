@@ -24,7 +24,7 @@ y <- df$Trump..R. - df$Biden..D.
 X <- model.matrix( ~ df$pollster )
 locs <- df$Days.Since.01.01.23
 
-m1 <- fit_model(y, locs, X, "matern_isotropic", silent = TRUE, m_seq = 200)
+m1 <- fit_model(y, locs, X, "matern_isotropic", silent = TRUE, m_seq = 50)
 
 summary(m1)
 
@@ -37,3 +37,151 @@ preds <- predictions( m1, locs_pred = days_pred, X_pred = X_pred, m = 200 )
 plot(days_pred, preds, type = "l", col = "blue", lwd = 2, xlab = "Days since 01.01.23", ylab = "Trump - Biden" )
 ```
 
+Perform model scoring for how the model would have performed for the month
+of January 2024.
+Requirements: The model must only have the data available up to the day before 
+the prediction date.
+I.E. Our prediction on January 1st should be based on data up to December 31st
+Preidction on January 2nd should be based on data up to January 1st, etc. 
+We want to be computationally efficient, so we should only be making predictions
+for the days that actually happened. 
+
+```{r}
+#First let's write a function that will subset the dataframe to only include the
+#data up to the day before the prediction date.
+
+subset_df <- function(df, date){
+  df <- df[df$date_y < date,]
+  return(df)
+}
+
+#test
+#df_jan_1 <- subset_df(df, "2024-01-09")
+
+#Additionally, we need to write a function that will craft an appropriate 
+#prediction df for the given date and model. 
+
+prediction_df_for_date <- function(df, date){
+  #Subset the df to just that date 
+  ndf <- df[df$date_y == date,]
+  pollsters <- unique(ndf$pollster)
+  #Now we need to create the X matrix for the model
+  sub_df <- subset_df(df, date)
+  #Check if the pollster is in the sub_df, if not, we need to add it
+  sub_df_pollsters <- unique(sub_df$pollster)
+  for(p in pollsters){
+    if(!(p %in% sub_df_pollsters)){
+      sub_df_pollsters <- c(sub_df_pollsters, p)
+    }
+  }
+  poll_pred <- factor(pollsters, levels = levels( as.factor(sub_df_pollsters) ) )
+  X_pred <- model.matrix( ~ poll_pred )
+  
+  return(X_pred)
+}
+#test
+#X_pred_jan_1 <- prediction_df_for_date(df, "2024-03-19")
+
+#Now we need to write a function that will make a model for a given date
+
+model_for_date <- function(df, date){
+  #Subset the df to just that date 
+  sub_df <- subset_df(df, date)
+  y <- sub_df$Trump..R. - sub_df$Biden..D.
+  X <- model.matrix( ~ sub_df$pollster )
+  locs <- sub_df$Days.Since.01.01.23
+  m <- fit_model(y, locs, X, "matern_isotropic", silent = TRUE, m_seq = 50)
+  return(m)
+}
+
+#test model
+#m_jan_1 <- model_for_date(df, "2024-01-09")
+
+#Quickly write a function also for locs_pred
+#Should simply be the integer day since 01.01.23
+
+locs_pred_for_date <- function(date){
+  days_since_23 <- as.integer(difftime(date, as.Date("2023-01-01")))
+  return(days_since_23)
+}
+
+#test
+#locs_pred_jan_1st <- rep(locs_pred_for_date("2024-01-09"), nrow(X_pred_jan_1))
+
+#Try to make a prediction for January 1st
+#X_pred_jan_1 <- predictions(m_jan_1, locs_pred = locs_pred_jan_1st, X_pred = X_pred_jan_1, m = 50)
+
+```
+
+
+Now that we have written all the functions we have needed, we can write one
+syntactic sugar function, and then loop over all the days in January 2024
+
+```{r}
+
+#First, let's write a function that will make a prediction for a given date
+
+make_prediction_for_date <- function(df, date){
+  #Now we need to make the model for that date
+  m <- model_for_date(df, date)
+  #Now we need to make the prediction df for that date
+  X_pred <- prediction_df_for_date(df, date)
+  #Now we need to make the locs_pred for that date
+  locs_pred <- rep(locs_pred_for_date(date), nrow(X_pred))
+  #Now we can make the prediction
+  
+  if (length(m$betahat) != ncol(X_pred)){
+    return(NA)
+  }
+  
+  pred <- predictions(m, locs_pred = locs_pred, X_pred = X_pred, m = 50)
+  return(pred)
+}
+
+#test
+#pred_jan_1 <- make_prediction_for_date(df, "2024-01-01")
+
+#Finally, we should write one function that can take the predictions and 
+#match them with the polling data for that day
+
+score_model_for_date <- function(df, date){
+  #First, we need to get the prediction
+  pred <- make_prediction_for_date(df, date)
+  #Now we need to get the actual polling data for that day
+  actual <- df[df$date_y == date,]$Trump..R. - df[df$date_y == date,]$Biden..D.
+  #Now we need to calculate the error
+  error <- mean((pred - actual)^2)
+  return(error)
+}
+
+models_for_date <- function(df,date){
+  ndf <- df[df$date_y == date,]
+  pollsters <- unique(ndf$pollster)
+  return(pollsters)
+}
+
+```
+
+```{r}
+#Let's loop over the days of january 2024 and score the model
+
+dates <- unique(df$date_y[df$date_y >= "2024-01-01"])
+#Make a dataframe of the predictions and the actuals
+errors <- data.frame(date = dates, error = rep(0, length(dates)))
+for (date in dates){
+  predictions <- make_prediction_for_date(df, date)
+  pollsters <- models_for_date(df, date)
+  actuals <- df[df$date_y == date,]$Trump..R. - df[df$date_y == date,]$Biden..D.
+  error <- mean((predictions - actuals)^2)
+  print(paste("The error for ", date, " is ", error))
+  errors[errors$date == date,]$error <- error
+}
+head(errors)
+```
+```{r}
+#Overall error
+mean(sqrt(errors$error), na.rm = TRUE)
+```
+
+This is a relatively low error, but we will need to compare it to the python
+models as well to see which ones are better. 
