@@ -46,6 +46,7 @@ Preidction on January 2nd should be based on data up to January 1st, etc.
 We want to be computationally efficient, so we should only be making predictions
 for the days that actually happened. 
 
+
 ```{r}
 #First let's write a function that will subset the dataframe to only include the
 #data up to the day before the prediction date.
