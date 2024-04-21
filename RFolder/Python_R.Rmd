@@ -1,8 +1,8 @@
 ---
-title: "Elections"
+title: "Linear Regression and XGBoost"
 author: "Robert Feldstein"
-date: "2024-04-07"
-output: html_document
+date: "2024-04-20"
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -13,38 +13,6 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library("GpGp")
 ```
-
-```{r}
-# Load the data
-
-df <- read.csv("/Users/robbiefeldstein/Documents/Programming/Election2024/RFolder/merged.csv")
-
-library("GpGp")
-y <- df$Trump..R. - df$Biden..D.
-X <- model.matrix( ~ df$pollster )
-locs <- df$Days.Since.01.01.23
-
-m1 <- fit_model(y, locs, X, "matern_isotropic", silent = TRUE, m_seq = 50)
-
-summary(m1)
-
-days_pred <- min( df$Days.Since.01.01.23 ) : max( df$Days.Since.01.01.23 ) 
-poll_pred <- rep("CNBC", length(days_pred) )
-poll_pred <- factor( poll_pred, levels = levels( as.factor(df$pollster) ) )
-X_pred <- model.matrix( ~ poll_pred )
-
-preds <- predictions( m1, locs_pred = days_pred, X_pred = X_pred, m = 200 )
-plot(days_pred, preds, type = "l", col = "blue", lwd = 2, xlab = "Days since 01.01.23", ylab = "Trump - Biden" )
-```
-
-Perform model scoring for how the model would have performed for the month
-of January 2024.
-Requirements: The model must only have the data available up to the day before 
-the prediction date.
-I.E. Our prediction on January 1st should be based on data up to December 31st
-Preidction on January 2nd should be based on data up to January 1st, etc. 
-We want to be computationally efficient, so we should only be making predictions
-for the days that actually happened. 
 
 
 ```{r}
@@ -166,7 +134,7 @@ models_for_date <- function(df,date){
 
 ```{r}
 #Let's loop over the days of january 2024 and score the model
-
+df <- read.csv("/Users/robbiefeldstein/Documents/Programming/Election2024/RFolder/merged.csv")
 dates <- unique(df$date_y[df$date_y >= "2024-01-01"])
 #Make a dataframe of the predictions and the actuals
 errors <- data.frame(date = dates, error = rep(0, length(dates)))
@@ -187,11 +155,34 @@ mean((errors$error), na.rm = TRUE)
 
 This is a relatively low error, but we will need to compare it to the python
 models as well to see which ones are better. 
+```{python}
+import requests
+import numpy as np
+import pandas as pd
+from datetime import datetime, timedelta
+from sklearn.linear_model import LinearRegression
 
-```{r}
-
-jan_9_2024 <- model_for_date(df, "2024-01-09")
-summary(jan_9_2024)
-jan_9_2024$conv
+merged = pd.read_csv("/Users/robbiefeldstein/Documents/Programming/Election2024/RFolder/merged.csv")
 ```
+
+```{python}
+training_df = merged[["Days Since 01-01-23", "biden"]].copy()
+training_df["biden"] = training_df["biden"].astype(float)
+X = training_df.dropna()
+y = merged["Biden (D)"]
+y.dropna(inplace=True)
+X["SinFreq1"] = np.sin(2 * np.pi * X["Days Since 01-01-23"] / 365)
+X["CosFreq1"] = np.cos(2 * np.pi * X["Days Since 01-01-23"] / 365)
+X.head()
+```
+```{python}
+model = LinearRegression()
+model.fit(X, y)
+y_pred = model.predict(X)
+```
+
+```{python}
+
+```
+
 
