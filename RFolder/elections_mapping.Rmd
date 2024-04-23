@@ -195,3 +195,16 @@ summary(jan_9_2024)
 jan_9_2024$conv
 ```
 
+```{r}
+# Load in other predictions
+LR_Predictions <- read.csv("../Datasets/linear_regression_predictions.csv")
+XGB_Predictions <- read.csv("../Datasets/betting_predictions.csv")
+
+```
+
+
+```{r}
+# Convert the python lists to R vectors
+LR_Predictions$Predictions <- as.vector(LR_Predictions$Predictions)
+```
+
