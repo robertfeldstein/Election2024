@@ -64,7 +64,7 @@ frequency_strings.append("Days Since 01-01-23")
 df.head()
 ```
 
-Building a Gaussian Process Model in R
+Building a Gaussian Process Model in R:
 ```R
 library("GpGp")
 y <- df$Trump..R. - df$Biden..D.
@@ -73,5 +73,9 @@ locs <- df$Days.Since.01.01.23
 
 m1 <- fit_model(y, locs, X, "matern_isotropic", silent = TRUE, m_seq = 50)
 ```
+
+Diagrams: 
+
+
 
 
