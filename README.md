@@ -8,6 +8,7 @@ The project is broken into a few working subdivisions:
 2. Modules
 3. Regression
 4. Datasets
+5. RFolder
 
 ## Exploratory Data Analysis and Visualization
 
@@ -29,13 +30,48 @@ Simple long-running prediction datasets created from running the regression mode
 
 We hope this repository can serve as a jumping off point for other users seeking to perform statistical analysis on polling data. 
 
+## RFolder 
+
+Some regression models are best suited to be created in R, where categorical data is better handled. In particular, this package makes large use of R's GpGp package (created by Professor Guinness) to perform optimized Gaussian Process regression. 
+
 In this repository we utilize code which scrapes data from RealClearPolitics. **We do not condone mass scraping of data from polling platforms.** Please utilize commands like time.sleep() to help limit strain on servers.
 
 Thank you!
 
 # Code Examples and Use Cases
 
-'''python
+Loading in the RealClearPolitics latest presidential polling data: 
 
-print("hello world")
-'''
+```python
+rcp = clean_data(get_poll_data())
+```
+
+Creating a simple sinusoidal regression dataframe: 
+
+```python
+scale = 365
+days = df["Days Since 01-01-23"]
+#Define some initial frequencies
+frequencies = [i*2 for i in range(1, 10)]
+def add_sine_cosine(df, freq, scale):
+    df['sinfreq' + str(freq)] = np.sin(freq *np.pi*days/scale)
+    df['cosfreq' + str(freq)] = np.cos(freq*np.pi*days/scale)
+for freq in frequencies:
+    add_sine_cosine(df, freq, scale)
+frequency_strings = ['sinfreq' + str(freq) for freq in frequencies] + ['cosfreq' + str(freq) for freq in frequencies]
+frequency_strings.append("Days Since 01-01-23")
+#Display the data with new frequencies
+df.head()
+```
+
+Building a Gaussian Process Model in R
+```R
+library("GpGp")
+y <- df$Trump..R. - df$Biden..D.
+X <- model.matrix( ~ df$pollster )
+locs <- df$Days.Since.01.01.23
+
+m1 <- fit_model(y, locs, X, "matern_isotropic", silent = TRUE, m_seq = 50)
+```
+
+
