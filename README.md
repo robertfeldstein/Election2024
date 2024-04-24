@@ -34,3 +34,8 @@ In this repository we utilize code which scrapes data from RealClearPolitics. **
 Thank you!
 
 # Code Examples and Use Cases
+
+'''python
+
+print("hello world")
+'''
