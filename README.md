@@ -87,3 +87,6 @@ A simple regression diagram representing RFK's (a third party candidate's) polli
 A more interesting scatterplot, representing how RFK's national polling impacts the spread in polling between Donald Trump and Joe Biden. This graph would indicate RFK mildly improves Trump's edge in the popular vote. 
 
 
+![polling_spread_regression](https://github.com/robertfeldstein/Election2024/assets/104737174/292dc93f-83c8-46fc-adb6-700b84625d1e)
+
+A simple gaussian process regression representing the observed difference in national polling between Donald Trump and Joe Biden, as reported by CNBC. CNBC was chosen as a median pollster, meaning that in the categorical regression model, CNBC had a median intercept. 
