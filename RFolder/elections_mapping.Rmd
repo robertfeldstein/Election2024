@@ -17,7 +17,7 @@ library("GpGp")
 ```{r}
 # Load the data
 
-df <- read.csv("/Users/robbiefeldstein/Documents/Programming/Election2024/RFolder/merged.csv")
+df <- read.csv("../RFolder/merged.csv")
 
 library("GpGp")
 y <- df$Trump..R. - df$Biden..D.
@@ -35,7 +35,10 @@ X_pred <- model.matrix( ~ poll_pred )
 
 preds <- predictions( m1, locs_pred = days_pred, X_pred = X_pred, m = 200 )
 plot(days_pred, preds, type = "l", col = "blue", lwd = 2, xlab = "Days since 01.01.23", ylab = "Trump - Biden" )
+title(main = "Trump Biden Spread Over Time for CNBC Polling")
 ```
+
+
 
 Perform model scoring for how the model would have performed for the month
 of January 2024.
