@@ -79,7 +79,7 @@ Diagrams:
 
 ![rfk_pa](https://github.com/robertfeldstein/Election2024/assets/104737174/f24945bf-7042-4e57-8ad7-dfdc839c0963)
 
-Simple diagram representing RFK (a third party candidate's) polling performance in PA, a crucial battleground state in the upcoming presidential election. 
+A simple regression diagram representing RFK's (a third party candidate's) polling performance in PA, a crucial battleground state in the upcoming presidential election. 
 
 
 
