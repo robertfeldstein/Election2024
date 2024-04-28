@@ -86,3 +86,4 @@ A simple regression diagram representing RFK's (a third party candidate's) polli
 
 A more interesting scatterplot, representing how RFK's national polling impacts the spread in polling between Donald Trump and Joe Biden. This graph would indicate RFK mildly improves Trump's edge in the popular vote. 
 
+
