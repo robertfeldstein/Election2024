@@ -82,5 +82,7 @@ Diagrams:
 A simple regression diagram representing RFK's (a third party candidate's) polling performance in PA, a crucial battleground state in the upcoming presidential election. 
 
 
+![rkf_spread](https://github.com/robertfeldstein/Election2024/assets/104737174/aa7506f5-155e-4d9b-baa8-19e0979f7bf7)
 
+A more interesting scatterplot, representing how RFK's national polling impacts the spread in polling between Donald Trump and Joe Biden. This graph would indicate RFK mildly improves Trump's edge in the popular vote. 
 
