@@ -12,7 +12,7 @@ The project is broken into a few working subdivisions:
 
 ## Exploratory Data Analysis and Visualization
 
-This is a catch-all folder for investigating and visualizing interesting questions. At the time of producing this GitHub a lot of chatter has surrounded the role of RFK Junior in the upcoming election. It is unclear in regards to who he will "take" votes from between Joe Biden and Donald Trump. While we do not directly answer this question, we do look at how the spread between Joe Biden and Donald Trump has changed in response to changes in RFK's support. **As a matter of consistency, we define spread to be the difference between Donald Trump and Joe Biden in polling throughout the project.**
+This is a catch-all folder for investigating and visualizing interesting questions. At the time of producing this GitHub a lot of chatter has surrounded the role of RFK Junior in the upcoming election. It is unclear in regards to who he will "take" votes from between Joe Biden and Donald Trump. While we do not directly answer this question, we do look at how the spread between Joe Biden and Donald Trump has changed in response to changes in RFK's support. **As a matter of consistency, we define spread as Donald Trump's polling numbers minus Joe Biden's.**
 
 ## Modules
 
@@ -26,7 +26,7 @@ The models in this project include: Simple Linear Regression, Sinusoidal Regress
 
 ## Datasets
 
-Simple long-running prediction datasets created from running the regression models. These datasets were scored in R to determine which model performed the best. Overall, Gaussian Process Regression is able to defeat off the wall XGBoost regression. 
+Simple long-running prediction datasets created from running the regression models. These datasets were scored in R to determine which model performed the best. Overall, Gaussian Process Regression is able to defeat off the shelf XGBoost regression. 
 
 We hope this repository can serve as a jumping off point for other users seeking to perform statistical analysis on polling data. 
 
@@ -40,6 +40,7 @@ Thank you!
 
 # Code Examples and Use Cases
 
+Using Python to load in datasets: 
 Loading in the RealClearPolitics latest presidential polling data: 
 
 ```python
@@ -74,19 +75,21 @@ locs <- df$Days.Since.01.01.23
 m1 <- fit_model(y, locs, X, "matern_isotropic", silent = TRUE, m_seq = 50)
 ```
 
-Diagrams: 
 
+Sample Analyses:
+
+
+As part of this project, we looked at how individual candidates were performing across core battleground states such as PA, MI, WI, FL, GA, and AZ. Using a locally weighted regression, we were able to characterize several candidate trends in key states. The following plot shows RFK's performance in PA since May of 2023. Note that the first polling point is an outlier, and most likely indicates % of voters who would vote for RFK in a head to head with Biden or a head to head with Trump. Later polling shows that RFK's sizable support has cut roughly in half. Still 10% of the vote in a battleground state like PA could fundamentally alter the entire race. 
 
 ![rfk_pa](https://github.com/robertfeldstein/Election2024/assets/104737174/f24945bf-7042-4e57-8ad7-dfdc839c0963)
 
-A simple regression diagram representing RFK's (a third party candidate's) polling performance in PA, a crucial battleground state in the upcoming presidential election. 
 
+We were interested in what effect RFK's presence in the race would have on the other two candidates's polling numbers. To investigate this, we looked at polls that asked respondents who they preferred between Trump and Biden, and who they preferred when more options were given, such as RFK Jr., Jill Stein, and Cornell West. In the figure below, we see that there exists a slight positive trend between RFK's polling average and Trump's polling. Despite this, we find that RFK's effect on the election is inconclusive at this point. Due to the relative infrequent release of polls and RFK's flat polling average, we do not have enough evidence yet to claim RFK pulls voters more from one candidate than another. 
 
 ![rkf_spread](https://github.com/robertfeldstein/Election2024/assets/104737174/aa7506f5-155e-4d9b-baa8-19e0979f7bf7)
 
-A more interesting scatterplot, representing how RFK's national polling impacts the spread in polling between Donald Trump and Joe Biden. This graph would indicate RFK mildly improves Trump's edge in the popular vote. 
-
+A large portion of our analysis was spent on treating the type of polling company as a categorical variable. In particular, it was interesting to study how the overall spread in polling between Joe Biden and Donald Trump could vary widely over the same across pollsters. In practice, we found that Gaussian Process regression performed remarkably similar to the discretized polls released by companies. The following figure shows a simple gaussian process regression representing the observed difference in national polling between Donald Trump and Joe Biden, as reported by CNBC.
 
 ![polling_spread_regression](https://github.com/robertfeldstein/Election2024/assets/104737174/292dc93f-83c8-46fc-adb6-700b84625d1e)
 
-A simple gaussian process regression representing the observed difference in national polling between Donald Trump and Joe Biden, as reported by CNBC. CNBC was chosen as a median pollster, meaning that in the categorical regression model, CNBC had a median intercept. 
+
