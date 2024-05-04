@@ -79,7 +79,7 @@ m1 <- fit_model(y, locs, X, "matern_isotropic", silent = TRUE, m_seq = 50)
 Sample Analyses:
 
 
-As part of this project, we looked at how individual candidates were performing across core battleground states such as PA, MI, WI, FL, GA, and AZ. Using a locally weighted regression, we were able to characterize several candidate trends in key states. The following plot shows RFK's performance in PA since May of 2023. Note that the first polling point is an outlier, and most likely indicates % of voters who would vote for RFK in a head to head with Biden or a head to head with Trump. Later polling shows that RFK's sizable support has cut roughly in half. Still 10% of the vote in a battleground state like PA could fundamentally alter the entire race. 
+As part of this project, we looked at how individual candidates were performing across core battleground states such as PA, MI, WI, FL, GA, and AZ. Using a locally weighted regression, we were able to characterize several candidate trends in key states. The following plot shows RFK's performance in PA since May of 2023. Note that the first polling point is an outlier, and most likely indicates % of voters who would vote for RFK in a head to head with Biden or a head to head with Trump. Later polling shows that RFK's sizable support has cut roughly in half. Still 10% of the vote in a battleground state like PA could fundamentally alter the entire race. It is also important to consider the relative infrequency of state-specific polls early-on in a presidential cycle. As the election gets closer to November, the standard error of the regression will decrease and approach reality.
 
 ![rfk_pa](https://github.com/robertfeldstein/Election2024/assets/104737174/f24945bf-7042-4e57-8ad7-dfdc839c0963)
 
@@ -88,7 +88,7 @@ We were interested in what effect RFK's presence in the race would have on the o
 
 ![rkf_spread](https://github.com/robertfeldstein/Election2024/assets/104737174/aa7506f5-155e-4d9b-baa8-19e0979f7bf7)
 
-A large portion of our analysis was spent on treating the type of polling company as a categorical variable. In particular, it was interesting to study how the overall spread in polling between Joe Biden and Donald Trump could vary widely over the same across pollsters. In practice, we found that Gaussian Process regression performed remarkably similar to the discretized polls released by companies. The following figure shows a simple gaussian process regression representing the observed difference in national polling between Donald Trump and Joe Biden, as reported by CNBC.
+A large portion of our analysis was spent on treating the type of polling company as a categorical variable. In particular, it was interesting to study how the overall spread in polling between Joe Biden and Donald Trump could vary widely over the same across pollsters. In practice, we found that Gaussian Process regression performed remarkably similar to the discretized polls released by companies. The following figure shows a simple gaussian process regression representing the observed difference in national polling between Donald Trump and Joe Biden, as reported by CNBC. This regression line remarkably matches the true spread as reported by RealClearPolling.
 
 ![polling_spread_regression](https://github.com/robertfeldstein/Election2024/assets/104737174/292dc93f-83c8-46fc-adb6-700b84625d1e)
 
